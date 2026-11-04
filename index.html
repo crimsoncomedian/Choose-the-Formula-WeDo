@@ -172,6 +172,9 @@
   .frac { display: inline-flex; flex-direction: column; vertical-align: middle; text-align: center; line-height: 1.15; margin: 0 4px; }
   .frac > span:first-child { border-bottom: 3px solid var(--ink); padding: 0 6px 2px; }
   .frac > span:last-child { padding: 2px 6px 0; }
+  .frac .frac { font-size: .78em; }
+  .frac .frac > span:first-child { border-bottom-width: 2px; }
+  .frac > span:first-child { border-bottom-width: 3px; }
 
   input.answer-input {
     width: 130px;
@@ -351,13 +354,13 @@ const OPTIONS = [
     formula: `σ<sub>x̄</sub> = ${frac("σ", "√n")}`,
     why: "The question is about how much sample means vary, and means of samples of size n vary less than individuals: σ divided by √n." },
   { id: "mean-z", kind: "mean", qty: "z",  name: "z-score for a sample mean",
-    formula: `z = ${frac("x̄ − μ", "σ<sub>x̄</sub>")}`,
+    formula: `z = ${frac("x̄ − μ", frac("σ", "√n"))}`,
     why: "The question is about one sample mean, so you compare it to μ in units of the standard deviation of the sampling distribution of sample means." },
   { id: "prop-sd", kind: "prop", qty: "sd", name: "Standard deviation of the sampling distribution of sample proportions",
     formula: `σ<sub>p̂</sub> = √${frac("p(1 − p)", "n")}`,
     why: "The question is about how much sample proportions vary from sample to sample, which depends on p and the sample size n." },
   { id: "prop-z", kind: "prop", qty: "z",  name: "z-score for a sample proportion",
-    formula: `z = ${frac("p̂ − p", "σ<sub>p̂</sub>")}`,
+    formula: `z = ${frac("p̂ − p", `√${frac("p(1 − p)", "n")}`)}`,
     why: "The question is about one sample proportion, so you compare it to p in units of the standard deviation of the sampling distribution of sample proportions." }
 ];
 
