@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Choose the Formula WeDo</title>
+<style>
+  :root {
+    --page-bg-1: #f8fbff;
+    --page-bg-2: #eef4ff;
+    --ink: #1f2937;
+    --muted: #667085;
+
+    --panel: rgba(255, 255, 255, 0.78);
+    --panel-border: rgba(148, 163, 184, 0.35);
+
+    --blue: #2563eb;
+    --blue-soft: #dbeafe;
+
+    --green-bg: #dcfce7;
+    --green-border: #22c55e;
+    --green-ink: #166534;
+
+    --red-bg: #fee2e2;
+    --red-border: #ef4444;
+    --red-ink: #991b1b;
+
+    --shadow-soft: 0 18px 45px rgba(15, 23, 42, 0.10);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    min-height: 100vh;
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+    text-align: center;
+    color: var(--ink);
+    margin: 0;
+    padding: 28px 16px 48px;
+    background:
+      radial-gradient(circle at top left, rgba(37, 99, 235, 0.16), transparent 34rem),
+      radial-gradient(circle at top right, rgba(14, 165, 233, 0.13), transparent 30rem),
+      linear-gradient(135deg, var(--page-bg-1), var(--page-bg-2));
+  }
+
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background-image:
+      linear-gradient(rgba(37, 99, 235, 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(37, 99, 235, 0.04) 1px, transparent 1px);
+    background-size: 34px 34px;
+    mask-image: linear-gradient(to bottom, black, transparent 85%);
+  }
+
+  h1 {
+    position: relative;
+    z-index: 1;
+    margin: 0 auto 14px;
+    font-size: clamp(2.1rem, 5vw, 3.4rem);
+    line-height: 1;
+    letter-spacing: -0.055em;
+    font-weight: 900;
+    color: #111827;
+  }
+
+  .toolbar {
+    position: relative;
+    z-index: 1;
+    margin: 0 auto 14px;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    color: var(--muted);
+    font-weight: 700;
+    font-size: .95rem;
+  }
+  select {
+    font: inherit;
+    font-weight: 800;
+    color: var(--ink);
+    padding: 7px 12px;
+    border-radius: 12px;
+    border: 2px solid rgba(100, 116, 139, 0.5);
+    background: #fff;
+  }
+
+  .context {
+    position: relative;
+    z-index: 1;
+    max-width: 760px;
+    margin: 0 auto 14px;
+    padding: 16px 24px;
+    font-size: clamp(1.05rem, 2.2vw, 1.3rem);
+    line-height: 1.45;
+    font-weight: 600;
+    background: rgba(255, 255, 255, 0.62);
+    border: 1px solid rgba(148, 163, 184, 0.26);
+    border-radius: 24px;
+    box-shadow: 0 4px 14px rgba(15,23,42,.06);
+  }
+
+  .question {
+    position: relative;
+    z-index: 1;
+    max-width: 760px;
+    margin: 0 auto 8px;
+    font-size: clamp(1.3rem, 3vw, 2rem);
+    line-height: 1.2;
+    font-weight: 900;
+    letter-spacing: -0.03em;
+    color: #111827;
+  }
+
+  .instruction {
+    position: relative;
+    z-index: 1;
+    margin: 4px auto 18px;
+    max-width: 720px;
+    min-height: 34px;
+    font-size: clamp(1.05rem, 2.2vw, 1.4rem);
+    line-height: 1.25;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--blue);
+  }
+
+  .stage {
+    position: relative;
+    z-index: 1;
+    width: fit-content;
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 20px 22px;
+    background: var(--panel);
+    border: 1px solid var(--panel-border);
+    border-radius: 24px;
+    box-shadow: var(--shadow-soft);
+    backdrop-filter: blur(18px);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .step {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .step .name {
+    width: 100%;
+    font-size: .9rem;
+    font-weight: 800;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: .04em;
+  }
+  .step .expr {
+    font-size: clamp(1.15rem, 2.6vw, 1.6rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    white-space: nowrap;
+  }
+  .step .unit { font-size: 1.5rem; font-weight: 800; }
+  .step + .step { padding-top: 14px; border-top: 1px solid rgba(148, 163, 184, 0.3); }
+  .frac { display: inline-flex; flex-direction: column; vertical-align: middle; text-align: center; line-height: 1.15; margin: 0 4px; }
+  .frac > span:first-child { border-bottom: 3px solid var(--ink); padding: 0 6px 2px; }
+  .frac > span:last-child { padding: 2px 6px 0; }
+
+  input.answer-input {
+    width: 130px;
+    height: 60px;
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--ink);
+    border: 3px solid rgba(100, 116, 139, 0.62);
+    border-radius: 16px;
+    background: linear-gradient(180deg, #ffffff, #f8fafc);
+    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.10);
+    transition: border-color 120ms ease, box-shadow 120ms ease;
+  }
+  input.answer-input:focus {
+    outline: none;
+    border-color: var(--blue);
+    box-shadow: 0 14px 28px rgba(37, 99, 235, 0.18), 0 0 0 5px rgba(37, 99, 235, 0.16);
+  }
+  input.incorrect {
+    color: var(--red-ink);
+    background: linear-gradient(180deg, #fff7f7, var(--red-bg));
+    border-color: var(--red-border);
+    animation: shake 160ms ease-in-out;
+  }
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    33% { transform: translateX(-3px); }
+    66% { transform: translateX(3px); }
+  }
+
+  .fixed-number {
+    min-width: 130px;
+    height: 60px;
+    padding: 0 14px;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: var(--green-ink);
+    background: linear-gradient(180deg, #f0fdf4, var(--green-bg));
+    border: 3px solid var(--green-border);
+    border-radius: 16px;
+  }
+  .fixed-number.shown {
+    color: var(--blue);
+    background: linear-gradient(180deg, #f5f9ff, var(--blue-soft));
+    border-color: var(--blue);
+  }
+
+  .status {
+    position: relative;
+    z-index: 1;
+    width: fit-content;
+    max-width: 92%;
+    margin: 16px auto 0;
+    padding: 8px 18px;
+    font-size: 1.05rem;
+    font-weight: 800;
+    border-radius: 999px;
+    border: 2px solid transparent;
+    min-height: 40px;
+  }
+  .status:empty { visibility: hidden; }
+  .status.no { background: var(--red-bg); border-color: var(--red-border); color: var(--red-ink); }
+  .status.yes { background: var(--green-bg); border-color: var(--green-border); color: var(--green-ink); border-radius: 20px; }
+
+  .buttons {
+    position: relative;
+    z-index: 1;
+    margin-top: 20px;
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  button.action {
+    font: inherit;
+    font-size: 1.05rem;
+    font-weight: 800;
+    padding: 12px 26px;
+    border-radius: 14px;
+    border: 2px solid var(--blue);
+    background: var(--blue);
+    color: #fff;
+    cursor: pointer;
+    box-shadow: 0 8px 18px rgba(37, 99, 235, 0.22);
+  }
+  button.action.secondary { background: #fff; color: var(--blue); box-shadow: none; }
+
+  .ztable-wrap { position: relative; z-index: 1; margin: 22px auto 0; max-width: 100%; }
+  .ztable-wrap[hidden] { display: none; }
+  .ztable-scroll {
+    max-height: 340px;
+    overflow: auto;
+    display: inline-block;
+    max-width: 100%;
+    background: #fff;
+    border: 1px solid var(--panel-border);
+    border-radius: 16px;
+    box-shadow: var(--shadow-soft);
+  }
+  table.ztable { border-collapse: collapse; font-size: .85rem; font-variant-numeric: tabular-nums; }
+  table.ztable th, table.ztable td { padding: 4px 9px; border: 1px solid #e5e7eb; }
+  table.ztable thead th { position: sticky; top: 0; background: var(--blue-soft); color: var(--blue); z-index: 1; }
+  table.ztable tbody th { background: #f8fafc; font-weight: 800; position: sticky; left: 0; }
+  .ztable-note { margin: 0 0 8px; font-size: .9rem; color: var(--muted); font-weight: 700; }
+
+  @media (max-width: 560px) {
+    .step .expr { white-space: normal; text-align: center; }
+    input.answer-input, .fixed-number { width: 100px; min-width: 100px; font-size: 1.25rem; }
+  }
+
+  .choices { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+  .choices button {
+    font: inherit; font-size: 1rem; font-weight: 800; padding: 12px 18px; border-radius: 14px;
+    border: 2px solid rgba(100, 116, 139, 0.62); background: #fff; color: var(--ink); cursor: pointer;
+    box-shadow: 0 6px 14px rgba(15, 23, 42, 0.08);
+  }
+  .choices button:hover { border-color: var(--blue); color: var(--blue); }
+  .choices button.incorrect { color: var(--red-ink); background: var(--red-bg); border-color: var(--red-border); animation: shake 160ms ease-in-out; }
+
+  .options { position: relative; z-index: 1; max-width: 860px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+  button.option {
+    font: inherit; text-align: center; cursor: pointer; color: var(--ink);
+    padding: 14px 14px 12px; border-radius: 18px; background: var(--panel);
+    border: 3px solid rgba(100, 116, 139, 0.45); box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+    display: flex; flex-direction: column; gap: 8px; align-items: center; justify-content: space-between;
+  }
+  button.option:hover:not(:disabled) { border-color: var(--blue); }
+  button.option .oname { font-size: .95rem; font-weight: 800; line-height: 1.2; color: var(--muted); }
+  button.option .oformula { font-size: 1.5rem; font-weight: 800; letter-spacing: -0.02em; }
+  button.option.wrong { color: var(--red-ink); background: var(--red-bg); border-color: var(--red-border); animation: shake 160ms ease-in-out; }
+  button.option.right { background: linear-gradient(180deg, #f0fdf4, var(--green-bg)); border-color: var(--green-border); color: var(--green-ink); }
+  button.option.shown { background: linear-gradient(180deg, #f5f9ff, var(--blue-soft)); border-color: var(--blue); color: var(--blue); }
+  button.option:disabled { cursor: default; }
+</style>
+</head>
+<body>
+<h1>Choose the Formula</h1>
+
+<div class="context" id="context"></div>
+<div class="question" id="question"></div>
+<div class="instruction" id="instruction">Which formula would you use to answer this?</div>
+
+<div class="options" id="options"></div>
+<div class="status" id="status"></div>
+
+<div class="buttons">
+  <button class="action" id="mainButton">Show Me</button>
+</div>
+
+<script>
+// ---------- helpers ----------
+function normalCdf(z) { // only used to keep generated z-scores in a sensible range
+  const t = 1 / (1 + 0.3275911 * Math.abs(z) / Math.SQRT2);
+  const poly = ((((1.061405429 * t - 1.453152027) * t + 1.421413741) * t - 0.284496736) * t + 0.254829592) * t;
+  const erf = 1 - poly * Math.exp(-(z * z) / 2);
+  return z >= 0 ? 0.5 * (1 + erf) : 0.5 * (1 - erf);
+}
+const round = (v, p) => { const f = 10 ** p; return Math.round(v * f + (v < 0 ? -1e-9 : 1e-9)) / f; };
+const pick = xs => xs[Math.floor(Math.random() * xs.length)];
+const int = (lo, hi) => lo + Math.floor(Math.random() * (hi - lo + 1));
+const num = (v, p = 6) => String(Number(v.toFixed(p)));
+const $ = id => document.getElementById(id);
+
+// ---------- the five formulas ----------
+// kind: which situation; qty: which quantity. Exactly one option is right for a
+// question, so a student has to read the situation AND what is being asked.
+const frac = (a, b) => `<span class="frac"><span>${a}</span><span>${b}</span></span>`;
+const OPTIONS = [
+  { id: "ind-z",  kind: "ind",  qty: "z",  name: "z-score for one individual",
+    formula: `z = ${frac("x − μ", "σ")}`,
+    why: "The question is about one individual value in a normal population, so you compare it to the mean in units of the population standard deviation." },
+  { id: "mean-sd", kind: "mean", qty: "sd", name: "Standard deviation of the sampling distribution of sample means",
+    formula: `σ<sub>x̄</sub> = ${frac("σ", "√n")}`,
+    why: "The question is about how much sample means vary, and means of samples of size n vary less than individuals: σ divided by √n." },
+  { id: "mean-z", kind: "mean", qty: "z",  name: "z-score for a sample mean",
+    formula: `z = ${frac("x̄ − μ", "σ<sub>x̄</sub>")}`,
+    why: "The question is about one sample mean, so you compare it to μ in units of the standard deviation of the sampling distribution of sample means." },
+  { id: "prop-sd", kind: "prop", qty: "sd", name: "Standard deviation of the sampling distribution of sample proportions",
+    formula: `σ<sub>p̂</sub> = √${frac("p(1 − p)", "n")}`,
+    why: "The question is about how much sample proportions vary from sample to sample, which depends on p and the sample size n." },
+  { id: "prop-z", kind: "prop", qty: "z",  name: "z-score for a sample proportion",
+    formula: `z = ${frac("p̂ − p", "σ<sub>p̂</sub>")}`,
+    why: "The question is about one sample proportion, so you compare it to p in units of the standard deviation of the sampling distribution of sample proportions." }
+];
+
+// ---------- contexts (same ones as the other WeDos in this set) ----------
+const QUANT = [
+  { population: "The heights of adult women", unit: "women", what: "height", statistic: "mean height", measure: "inches", mu: 64.5, sigmas: [2.4, 2.5, 3], places: 1 },
+  { population: "The battery lives of a certain phone model", unit: "phones", what: "battery life", statistic: "mean battery life", measure: "hours", mu: 18, sigmas: [2, 3, 4, 5], places: 1 },
+  { population: "The weights of bags of potato chips from a factory", unit: "bags", what: "weight", statistic: "mean weight", measure: "ounces", mu: 10.2, sigmas: [0.4, 0.5, 0.6, 0.8], places: 2 },
+  { population: "The daily commute times for workers in a city", unit: "workers", what: "commute time", statistic: "mean commute time", measure: "minutes", mu: 32, sigmas: [8, 10, 12, 15], places: 1 },
+  { population: "The scores on a college entrance exam", unit: "students", what: "score", statistic: "mean score", measure: "points", mu: 1050, sigmas: [100, 120, 150, 200], places: 0 },
+  { population: "The lifetimes of a brand of light bulb", unit: "bulbs", what: "lifetime", statistic: "mean lifetime", measure: "hours", mu: 1200, sigmas: [80, 100, 120, 150], places: 0 },
+  { population: "The resting heart rates of teenagers", unit: "teenagers", what: "heart rate", statistic: "mean heart rate", measure: "beats per minute", mu: 74, sigmas: [8, 10, 12], places: 1 },
+  { population: "The amounts of soda dispensed by a vending machine", unit: "cups", what: "amount", statistic: "mean amount", measure: "ounces", mu: 12, sigmas: [0.4, 0.6, 0.8, 1], places: 2 }
+];
+const MEAN_NS = [4, 9, 16, 25, 36, 49, 64, 100];
+const PROP = [
+  { fact: pct => `In a certain city, ${pct}% of residents support a new bond measure.`, unit: "residents", trait: "support the measure", ps: [0.4, 0.5, 0.6, 0.2, 0.8] },
+  { fact: pct => `${pct}% of students at a large university own a car.`, unit: "students", trait: "own a car", ps: [0.2, 0.4, 0.5, 0.6, 0.8] },
+  { fact: pct => `A factory finds that ${pct}% of the widgets it produces are defective.`, unit: "widgets", trait: "are defective", ps: [0.1, 0.2, 0.3, 0.4] },
+  { fact: pct => `${pct}% of the seeds of a certain flower germinate.`, unit: "seeds", trait: "germinate", ps: [0.6, 0.7, 0.8, 0.9] },
+  { fact: pct => `${pct}% of the voters in a state are registered independents.`, unit: "voters", trait: "are registered independents", ps: [0.2, 0.3, 0.4, 0.5] },
+  { fact: pct => `${pct}% of a website's visitors click on its ad.`, unit: "visitors", trait: "click on the ad", ps: [0.1, 0.2, 0.3, 0.4] },
+  { fact: pct => `${pct}% of teenagers get at least 8 hours of sleep on a school night.`, unit: "teenagers", trait: "get at least 8 hours of sleep", ps: [0.2, 0.3, 0.4, 0.5] },
+  { fact: pct => `${pct}% of the free throws a basketball player takes go in.`, unit: "free throws", trait: "go in", ps: [0.6, 0.7, 0.8, 0.9] }
+];
+const PROP_NS = [25, 36, 50, 64, 80, 100, 125, 150, 200, 225, 250, 300, 400, 500, 600, 800, 900, 1000];
+
+// ---------- problem ----------
+function makeProblem(prevId) {
+  for (let tries = 0; tries < 500; tries++) {
+    const opt = pick(OPTIONS);
+    if (opt.id === prevId && Math.random() < 0.8) continue;      // avoid long runs of the same answer
+    const { kind, qty } = opt;
+    let s, n = null, sigma = null, center, spread, places;
+    if (kind === "prop") {
+      s = pick(PROP); center = pick(s.ps); n = pick(PROP_NS);
+      if (n * center < 10 || n * (1 - center) < 10) continue;
+      spread = Math.sqrt(center * (1 - center) / n); places = 3;
+    } else {
+      s = pick(QUANT); center = s.mu; sigma = pick(s.sigmas); places = s.places;
+      if (kind === "mean") { n = pick(MEAN_NS); spread = sigma / Math.sqrt(n); } else spread = sigma;
+    }
+    let bound = null;
+    if (qty === "z") {
+      bound = round(center + (Math.random() < 0.5 ? -1 : 1) * spread * int(5, 28) / 10, places);
+      if (kind === "prop" && (bound <= 0 || bound >= 1)) continue;
+      const z = (bound - center) / spread;
+      if (Math.abs(z) < 0.3 || Math.abs(z) > 2.9) continue;
+    }
+    return { opt, kind, qty, s, center, sigma, n, bound };
+  }
+}
+
+let P = null, solved = false;
+
+function render() {
+  const p = P, s = p.s;
+  let ctx;
+  if (p.kind === "prop") {
+    ctx = `${s.fact(num(p.center * 100, 1))} Random samples of ${p.n} ${s.unit} are taken, and the proportion of ${s.unit} in each sample that ${s.trait} is recorded.`;
+  } else {
+    ctx = `${s.population} are normally distributed with a mean of ${num(p.center)} ${s.measure} and a standard deviation of ${num(p.sigma)} ${s.measure}.`;
+    if (p.kind === "mean") ctx += ` Random samples of ${p.n} ${s.unit} are taken, and the ${s.statistic} of each sample is recorded.`;
+  }
+  $("context").textContent = ctx;
+  let q;
+  if (p.kind === "ind") q = `What is the z-score for a ${s.what} of ${num(p.bound)} ${s.measure}?`;
+  else if (p.kind === "mean") q = p.qty === "z"
+    ? `What is the z-score for a sample with a ${s.statistic} of ${num(p.bound)} ${s.measure}?`
+    : `What is the standard deviation of the sample means?`;
+  else q = p.qty === "z"
+    ? `What is the z-score for a sample in which ${num(p.bound * 100, 1)}% ${s.trait}?`
+    : `What is the standard deviation of the sample proportions?`;
+  $("question").textContent = q;
+}
+
+function say(text, cls) { $("status").textContent = text || ""; $("status").className = "status" + (cls ? " " + cls : ""); }
+
+function drawOptions() {
+  const box = $("options");
+  box.innerHTML = "";
+  OPTIONS.forEach(o => {
+    const b = document.createElement("button");
+    b.className = "option";
+    b.dataset.id = o.id;
+    b.innerHTML = `<span class="oname">${o.name}</span><span class="oformula">${o.formula}</span>`;
+    b.addEventListener("click", () => choose(o, b));
+    box.appendChild(b);
+  });
+}
+
+// A wrong pick gets a nudge that names the thing to re-read, not the answer.
+function nudge(chosen) {
+  const right = P.opt;
+  if (chosen.kind !== right.kind) {
+    if (chosen.kind === "ind" || right.kind === "ind") return "Not quite. Is the question about one individual, or about samples?";
+    return "Not quite. Is this about a mean (a measurement) or a proportion (a percent that has a trait)?";
+  }
+  return "Not quite. Is the question asking how far a value is from the center, or how much sample results vary?";
+}
+
+function lockAll(rightId, cls) {
+  document.querySelectorAll("#options button").forEach(b => {
+    b.disabled = true;
+    b.classList.remove("wrong");
+    if (b.dataset.id === rightId) b.classList.add(cls);
+  });
+}
+
+function choose(o, btn) {
+  if (solved) return;
+  if (o.id === P.opt.id) {
+    solved = true;
+    lockAll(o.id, "right");
+    $("instruction").textContent = "Correct!";
+    say(P.opt.why, "yes");
+    $("mainButton").textContent = "New Problem";
+  } else {
+    btn.classList.remove("wrong"); void btn.offsetWidth; btn.classList.add("wrong");
+    say(nudge(o), "no");
+  }
+}
+
+function showMe() {
+  solved = true;
+  lockAll(P.opt.id, "shown");
+  $("instruction").textContent = "Here is the formula to use.";
+  say(P.opt.why, "yes");
+  $("mainButton").textContent = "New Problem";
+}
+
+function start() {
+  P = makeProblem(P && P.opt.id);
+  solved = false;
+  render();
+  drawOptions();
+  say("");
+  $("instruction").textContent = "Which formula would you use to answer this?";
+  $("mainButton").textContent = "Show Me";
+}
+
+$("mainButton").addEventListener("click", () => { if (solved) start(); else showMe(); });
+start();
+</script>
+</body>
+</html>
